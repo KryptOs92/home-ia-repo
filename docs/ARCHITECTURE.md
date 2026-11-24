@@ -441,6 +441,12 @@ ia-casa/
 
 This is the target structure. Directories must be created progressively as required.
 
+pnpm discovers packages under `apps/*`, `workers/*`, `services/*`, and `packages/*`.
+Packages can declare local dependencies with `workspace:*`. Turborepo uses
+those dependencies and `turbo.json` to schedule package scripts and cache
+build outputs. TypeScript projects extend the root `tsconfig.base.json` and
+set compiler options specific to their runtime in their own configurations.
+
 ## 15. Deployment architecture
 
 ### Development
@@ -451,6 +457,10 @@ This is the target structure. Directories must be created progressively as requi
 - Docker Desktop.
 - Docker Compose.
 - Development workspace container.
+
+The workspace image builds from `infrastructure/docker/`. Compose mounts the
+repository at `/workspace` at runtime and uses the configured local UID and
+GID for processes that write to it.
 
 ### Production
 

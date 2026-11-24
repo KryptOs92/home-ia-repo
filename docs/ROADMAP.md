@@ -16,22 +16,23 @@ Do not start the next phase until the current phase has been validated.
 - [x] Create initial directory structure.
 - [x] Create development Dockerfile and Docker Compose configuration.
 - [x] Start development workspace container.
-- [ ] Verify Docker and WSL configuration.
-- [ ] Verify Node.js, npm and pnpm inside the container.
+- [x] Verify Docker and WSL configuration.
+- [x] Verify Node.js, npm and pnpm inside the container.
 
 Acceptance criteria: development workspace is running and required commands work.
 
 ## Phase 1 — Monorepo initialization
 
-- [ ] Initialize root package.json.
-- [ ] Configure pnpm Workspaces.
-- [ ] Install Turborepo.
-- [ ] Configure turbo.json.
-- [ ] Configure shared TypeScript settings.
-- [ ] Configure ESLint and Prettier.
-- [ ] Review gitignore and Docker build context.
-- [ ] Verify monorepo commands.
-- [ ] Create initial Git commit after approval.
+- [x] Initialize root package.json.
+- [x] Configure pnpm Workspaces.
+- [x] Install Turborepo.
+- [x] Configure turbo.json.
+- [x] Configure shared TypeScript settings.
+- [x] Configure ESLint and Prettier.
+- [x] Review gitignore and Docker build context.
+- [x] Verify monorepo commands.
+- [x] Confirm the initial Git commit exists (`332a497`).
+- [ ] Commit the verified Phase 1 changes after approval.
 
 Acceptance criteria: workspace dependencies and shared development commands operate correctly.
 

@@ -76,7 +76,11 @@ Initial runtime baseline: Node.js 24 LTS.
 
 Initial package manager baseline: pnpm 10.
 
-Pin exact versions after compatibility verification.
+Verified development toolchain: Node.js 24.22.3, npm 11.19.1, pnpm 10.34.9,
+Turborepo 2.11.13, TypeScript 6.0.3, ESLint 10.15.0, typescript-eslint 8.74.0,
+and Prettier 3.10.1. The development Dockerfile pins Node.js and pnpm.
+The root manifest declares the pnpm version and the lockfile pins the
+dependency graph.
 
 ## 6. Authentication
 

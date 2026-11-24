@@ -3,8 +3,8 @@ name: ia-casa
 services:
   workspace:
     build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.dev
+      context: ./infrastructure/docker
+      dockerfile: Dockerfile.dev
 
     working_dir: /workspace
 

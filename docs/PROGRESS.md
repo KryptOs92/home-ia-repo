@@ -1,285 +1,84 @@
 # IA-Casa — Project Progress
 
-Last recorded update: 2026-11-24.
+Last recorded update: 2026-11-25.
 
 ## Current phase
 
-Phase 0 / Phase 1 — Development environment and monorepo initialization.
+Phase 0 is verified. Phase 1 meets its technical acceptance criteria.
+The initial Git commit (`332a497`) already exists. The Phase 1 changes are
+pending developer review and commit approval.
 
-## Current environment
+## Verified development environment
 
 | Component | Status |
 |---|---|
-| Operating system | Windows |
-| Development environment | WSL |
-| IDE | VS Code |
-| Docker Desktop | Running |
-| GitHub repository | Created |
-| Repository name | ia-casa |
-| Repository architecture | Monorepo |
-| Local repository | Cloned inside WSL |
-| Development workspace container | Successfully started |
-| Host Node.js | 12.22.9, obsolete |
-| Container Node.js | Expected 24.x, verification pending |
-| Container pnpm | Expected 10.x, verification pending |
+| Development filesystem | Repository under `/home/kryptos/project/home-ia-repo` in Ubuntu on WSL 2 |
+| Docker | Docker Desktop with Linux engine 29.9.3 and Compose 5.7.0 |
+| Compose workspace | Rebuilt and running, with ports 3000 and 4000 bound to loopback |
+| Workspace user | UID/GID 1000:1000, matching the WSL user and checked files and directories |
+| Node.js | 24.22.3 in the container |
+| npm | 11.19.1 in the container |
+| pnpm | 10.34.9 in the container |
+| Turborepo | 2.11.13 from the workspace lockfile |
 
-## Completed operations
+Before this verification, the repository already had the development
+Dockerfile, Compose service, project documentation, root manifest, lockfile,
+`pnpm-workspace.yaml` and `turbo.json`. The workspace folders existed locally,
+with no application or shared package manifests. The first Turbo dry run
+failed because `package.json` lacked a package manager declaration.
 
-- [x] Defined project architecture.
-- [x] Selected Apache Kafka instead of BullMQ.
-- [x] Selected Qdrant instead of pgvector.
-- [x] Selected PostgreSQL.
-- [x] Selected local S3-compatible object storage.
-- [x] Selected Next.js and Express.js.
-- [x] Selected Capacitor and PWA.
-- [x] Selected monorepo architecture.
-- [x] Selected independent Helm releases.
-- [x] Created GitHub repository.
-- [x] Cloned repository inside WSL.
-- [x] Opened repository in VS Code.
-- [x] Successfully executed Docker Compose build and startup.
-- [x] Created project documentation files.
+## Phase 1 changes
 
-## Expected initial directories
+| File | Change |
+|---|---|
+| `package.json`, `pnpm-lock.yaml` | Declare the exact pnpm version, add shared development tools and expose the type check task |
+| `pnpm-workspace.yaml` | Verify the four workspace patterns and format the file |
+| `turbo.json` | Add the type check task and include shared TypeScript and ESLint settings in task hashes |
+| `tsconfig.base.json` | Enable strict type checking and consistent file name casing for projects that extend it |
+| `eslint.config.mjs`, `.prettierrc.json`, `.prettierignore` | Define shared lint rules and use Prettier's defaults while leaving the generated lockfile to pnpm |
+| `compose.yaml`, `infrastructure/docker/Dockerfile.dev` | Limit the build context to the Dockerfile directory and pin the verified Node.js and pnpm versions |
+| `docs/ARCHITECTURE.md`, `docs/TECH_STACK.md`, `docs/ROADMAP.md`, `docs/PROGRESS.md` | Record verified architecture, tool versions and milestones |
 
-```text
-apps/frontend/
-apps/backend/
-workers/
-services/
-packages/
-infrastructure/docker/
-infrastructure/helm/
-.github/workflows/
-docs/
-```
+## Verification on 2026-11-25
 
-Verify actual directories against the repository.
-
-## Expected development Dockerfile
-
-Path:
-
-`infrastructure/docker/Dockerfile.dev`
-
-```dockerfile
-FROM node:24-bookworm-slim
-
-RUN npm install -g pnpm@10
-
-WORKDIR /workspace
-
-CMD ["sleep", "infinity"]
-```
-
-This image provides the initial Node.js development environment.
-
-The exact pnpm version will be pinned after verification.
-
-## Expected Docker Compose configuration
-
-Path:
-
-`compose.yaml`
-
-```yaml
-name: ia-casa
-
-services:
-  workspace:
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.dev
-
-    working_dir: /workspace
-
-    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
-
-    environment:
-      HOME: /tmp
-
-    volumes:
-      - .:/workspace
-
-    ports:
-      - "127.0.0.1:3000:3000"
-      - "127.0.0.1:4000:4000"
-
-    stdin_open: true
-    tty: true
-```
-
-The workspace container is a temporary shared development environment.
-
-Future applications will have independent development and production containers.
-
-## Last successful command reported by developer
-
-```bash
-docker-compose up -d --build
-```
-
-The developer confirmed that the command completed successfully.
-
-Prefer the modern Docker Compose command in future instructions:
-
-```bash
-docker compose up -d --build
-```
+- `git status`, `git ls-files`, `git log`, and `git check-ignore` confirmed
+  the repository history, tracked files and ignore rules for generated files,
+  local data and environment files. The `.env.example` exception works.
+- `docker compose config --quiet`, `docker compose build workspace`,
+  `docker compose up -d --no-build workspace`, and `docker compose ps --all`
+  validated the configuration and the rebuilt service. Runtime version,
+  identity and ownership checks ran inside the rebuilt container.
+- `pnpm install --frozen-lockfile` succeeded in the workspace and in a clean
+  temporary directory inside the container. The clean installation ran
+  Turbo 2.11.13 without downloading a fallback binary.
+- `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm test`, and `pnpm typecheck`
+  all exited successfully. ESLint checked the workspace configuration.
+  Turbo reported zero package tasks because the repository currently has
+  only the root package.
+- `pnpm exec prettier --check` passed on the workspace configuration files.
+- Two temporary packages verified `workspace:*` linking, dependency-first
+  Turbo builds, shared TypeScript settings and ESLint rules. Build and
+  type checking passed. The negative checks produced the expected ESLint
+  error for explicit `any` and TypeScript error for implicit `any`.
 
 ## Next immediate task
 
-Verify the actual repository and the running workspace container.
-
-Execute:
-
-```bash
-pwd
-git status
-docker compose ps
-```
-
-Verify the runtime inside the container:
-
-```bash
-docker compose exec workspace node --version
-docker compose exec workspace npm --version
-docker compose exec workspace pnpm --version
-```
-
-Inspect:
-
-- package.json
-- pnpm-workspace.yaml
-- pnpm-lock.yaml
-- turbo.json
-- compose.yaml
-- infrastructure/docker/Dockerfile.dev
-- .gitignore
-
-Some of these files may not exist yet.
-
-Do not overwrite existing configuration without inspection.
-
-## Pending monorepo tasks
-
-- [ ] Verify container runtime versions.
-- [ ] Initialize package.json if missing.
-- [ ] Configure pnpm Workspaces if missing.
-- [ ] Install Turborepo if missing.
-- [ ] Configure turbo.json.
-- [ ] Pin exact package manager version.
-- [ ] Verify permissions.
-- [ ] Verify workspace installation.
-- [ ] Review initial project configuration.
-- [ ] Request approval before first commit.
-
-## Target root package.json
-
-```json
-{
-  "name": "ia-casa",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "test": "turbo run test"
-  }
-}
-```
-
-The packageManager field must be added using the actual installed pnpm version.
-
-## Target pnpm-workspace.yaml
-
-```yaml
-packages:
-  - "apps/*"
-  - "workers/*"
-  - "services/*"
-  - "packages/*"
-```
-
-## Target turbo.json
-
-```json
-{
-  "$schema": "https://turbo.build/schema.json",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "out/**",
-        "dist/**"
-      ]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "test": {
-      "dependsOn": ["^build"]
-    }
-  }
-}
-```
-
-These configurations were proposed but have not been confirmed as implemented.
-
-## Components not yet confirmed as implemented
-
-- pnpm Workspaces.
-- Turborepo.
-- Next.js frontend.
-- Express backend.
-- PostgreSQL.
-- Kafka.
-- Qdrant.
-- SeaweedFS.
-- Docling.
-- Ollama.
-- Keycloak.
-- Capacitor.
-- GitHub Actions.
-- Kubernetes.
-- Helm.
-- Strimzi.
-- Argo CD.
-- Monitoring infrastructure.
+Review the verified Phase 1 changes. The next implementation phase in
+`ROADMAP.md` is the Next.js frontend foundation in `apps/frontend`.
 
 ## Open technical decisions
 
-- Exact dependency and container image versions.
+- Exact versions for future dependencies and container images.
 - Final Node.js Kafka client.
 - Sparse embedding encoder.
-- Production server configuration.
-- Production persistent storage.
-- Backup strategy implementation.
-- Private remote access configuration.
+- Production server configuration and persistent storage.
+- Backup strategy and private remote access.
 - Mobile signing and distribution.
 - Exact resource requirements.
 
 ## Progress maintenance rules
 
-Update this file after every completed task.
-
-Record:
-
-- Date.
-- Completed operation.
-- Modified files.
-- Commands executed.
-- Verification results.
-- Remaining issues.
-- Next immediate task.
-
-Do not mark planned or unverified work as completed.
-
-The actual repository always takes precedence over this progress document.
+Update this file after every completed task. Record the date, operation, files,
+commands, verification results, remaining issues and next immediate task.
+Mark tasks complete after verification. The actual repository takes
+precedence over this progress document.

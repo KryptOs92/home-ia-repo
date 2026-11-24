@@ -1,6 +1,6 @@
-FROM node:24-bookworm-slim
+FROM node:24.22.3-bookworm-slim
 
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@10.34.9
 
 WORKDIR /workspace
 
