@@ -1,0 +1,39 @@
+# Node.js
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Build
+dist/
+build/
+
+# Turborepo
+.turbo/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# Testing
+coverage/
+
+# Local data
+/data/
+/storage/
+/backups/
+
+# Logs
+*.log
+
+# Operating systems
+.DS_Store
+Thumbs.db

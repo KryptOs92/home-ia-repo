@@ -1,0 +1,24 @@
+name: ia-casa
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.dev
+
+    working_dir: /workspace
+
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+
+    environment:
+      HOME: /tmp
+
+    volumes:
+      - .:/workspace
+
+    ports:
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:4000:4000"
+
+    stdin_open: true
+    tty: true
